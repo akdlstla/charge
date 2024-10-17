@@ -59,7 +59,7 @@ const SignUp: React.FC = () => {
     const onFinish = async (values: any) => {
         console.log('Received values of form: ', values);
         try {
-            const response = await axios.post('http://localhost:5005/api/sign', {
+            const response = await axios.post('http://localhost:8000/signup', {
                 id: values.id,
                 password: values.password,
                 name: values.name,
@@ -118,7 +118,7 @@ const SignUp: React.FC = () => {
                 rules={[
                     {
                         required: true,
-                        message: '이메일을 입력해 주세요',
+                        message: '아이디를 입력해 주세요',
                     },
                 ]}
             >
@@ -170,16 +170,19 @@ const SignUp: React.FC = () => {
                 <Input />
             </Form.Item>
 
-            <Form.Item
-                name="birthday"
-                label="생년월일"
-                rules={[{ required: true, message: '생년월일을 입력해 주세요', whitespace: true }]}
-            >
-                <Input style={{ width: '30%', marginRight: '5px' }} />
-                <Input style={{ width: '25%', marginRight: '5px' }} />
-                <Input style={{ width: '25%' }} />
+            <Form.Item label="생년월일" required>
+                <Space.Compact>
+                    <Form.Item name="birthYear" noStyle rules={[{ required: true, message: '년도를 입력해 주세요' }]}>
+                        <Input style={{ width: '30%' }} placeholder="YYYY" />
+                    </Form.Item>
+                    <Form.Item name="birthMonth" noStyle rules={[{ required: true, message: '월을 입력해 주세요' }]}>
+                        <Input style={{ width: '25%', margin: '0 5px' }} placeholder="MM" />
+                    </Form.Item>
+                    <Form.Item name="birthDay" noStyle rules={[{ required: true, message: '일을 입력해 주세요' }]}>
+                        <Input style={{ width: '25%' }} placeholder="DD" />
+                    </Form.Item>
+                </Space.Compact>
             </Form.Item>
-
             <Form.Item
                 name="phone"
                 label="핸드폰 번호"
@@ -188,14 +191,36 @@ const SignUp: React.FC = () => {
                 <Input style={{ width: '100%' }} />
             </Form.Item>
 
-            <Form.Item name="residence" label="주소" rules={[{ required: true, message: '주소를 입력해 주세요' }]}>
-                <Input.Group compact>
-                    {' '}
-                    <Input value={address} style={{ width: '75%' }} readOnly />{' '}
-                    <Button onClick={() => setIsModalVisible(true)}>주소찾기</Button>
-                    <Input placeholder="상세 주소를 입력하세요" style={{marginTop:'5px'}}/>
-                </Input.Group>
-            </Form.Item>
+            <Form.Item 
+  name="residence" 
+  label="주소" 
+  rules={[{ required: true, message: '주소를 입력해 주세요' }]}
+>
+  <Input.Group compact>
+    <Input 
+      style={{ width: 'calc(100% - 100px)' }} 
+      readOnly 
+      value={address}
+      onChange={(e) => {
+        setAddress(e.target.value);
+        form.setFieldsValue({ residence: e.target.value });
+      }}
+    />
+    <Button onClick={() => setIsModalVisible(true)}>주소찾기</Button>
+  </Input.Group>
+</Form.Item>
+<Form.Item
+  name="detailAddress"
+  label="상세 주소"
+>
+  <Input 
+    placeholder="상세 주소를 입력하세요" 
+    onChange={(e) => {
+      const fullAddress = `${address} ${e.target.value}`.trim();
+      form.setFieldsValue({ residence: fullAddress });
+    }}
+  />
+</Form.Item>
 
             <Form.Item
                 name="agreement"
